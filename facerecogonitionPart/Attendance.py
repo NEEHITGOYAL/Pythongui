@@ -2,7 +2,9 @@ import cv2
 import numpy as np
 import face_recognition
 import os
+import requests
 from datetime import datetime
+
 # from PIL import ImageGrab
  
 path = 'ImagesAttendance'
@@ -23,7 +25,15 @@ def findEncodings(images):
         encode = face_recognition.face_encodings(img)[0]
         encodeList.append(encode)
     return encodeList
- 
+
+def markAttendance2(name):
+    roll_no = "189086"
+    class_name = "First" 
+    password = "1016594680"
+    url = "http://3.142.45.62/api/update/student/attend"
+    record = requests.put(url, json ={'class_name':class_name, 'roll_no':roll_no, 'password':password , 'name':"xyz"})
+    print(record.text)
+markAttendance2("ggugu")
 def markAttendance(name):
     with open('Attendance.csv','r+') as f:
         myDataList = f.readlines()
