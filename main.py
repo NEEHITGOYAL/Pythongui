@@ -27,18 +27,41 @@ class add(QMainWindow):
         QMainWindow.__init__(self)
         self.ui = Ui_add()
         self.ui.setupUi(self)
+        self.ui.BACK.clicked.connect(self.menu)
+    def menu(self):
+         #connect menu window
+        self.main = menu()
+        self.main.show()
+        # CLOSE add
+        self.close()
+
+
 
 class update(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         self.ui = Ui_update()
         self.ui.setupUi(self)
-
+        self.ui.BACK.clicked.connect(self.menu)
+    def menu(self):
+         #connect menu window
+        self.main = menu()
+        self.main.show()
+        # CLOSE update
+        self.close()    
+        
 class DELETE_2(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         self.ui = Ui_DELETE_2()
         self.ui.setupUi(self)
+        self.ui.BACK.clicked.connect(self.menu)
+    def menu(self):
+         #connect menu window
+        self.main = menu()
+        self.main.show()
+        # CLOSE delete
+        self.close()   
 
 class menu(QMainWindow):
     def __init__(self):
@@ -63,6 +86,9 @@ class menu(QMainWindow):
         # CLOSE menu
         self.close() 
     def facerecog(self):
+        msg = QMessageBox()
+        msg.setText("INSTRUCTION: PRESS 'Q' to close the camera")
+        msg.exec_()  
         os.system("./Attendance.py ")
 
         #connect attendance.py     #     

@@ -62,7 +62,8 @@ class Ui_update(object):
         self.batchend.setObjectName("batchend")
         self.verticalLayout_12.addWidget(self.batchend)
         self.inp_batend = QtWidgets.QLineEdit(self.frame)
-        self.inp_batend.setStyleSheet("color: rgb(136, 138, 133);")
+        self.inp_batend.setStyleSheet("color: rgb(136, 138, 133);\n"
+"")
         self.inp_batend.setText("")
         self.inp_batend.setObjectName("inp_batend")
         self.verticalLayout_12.addWidget(self.inp_batend)
@@ -187,18 +188,18 @@ class Ui_update(object):
 "color: rgb(238, 238, 236);")
         self.BACK.setObjectName("BACK")
         self.horizontalLayout.addWidget(self.BACK)
-        self.SUBMIT = QtWidgets.QPushButton(self.layoutWidget1)
-        self.SUBMIT.setMinimumSize(QtCore.QSize(0, 44))
+        self.UPDATE_IT = QtWidgets.QPushButton(self.layoutWidget1)
+        self.UPDATE_IT.setMinimumSize(QtCore.QSize(0, 44))
         font = QtGui.QFont()
         font.setFamily("Umpush")
         font.setPointSize(18)
         font.setBold(True)
         font.setWeight(75)
-        self.SUBMIT.setFont(font)
-        self.SUBMIT.setStyleSheet("background-color: rgb(114, 31, 203);\n"
+        self.UPDATE_IT.setFont(font)
+        self.UPDATE_IT.setStyleSheet("background-color: rgb(114, 31, 203);\n"
 "color: rgb(238, 238, 236);")
-        self.SUBMIT.setObjectName("SUBMIT")
-        self.horizontalLayout.addWidget(self.SUBMIT)
+        self.UPDATE_IT.setObjectName("UPDATE_IT")
+        self.horizontalLayout.addWidget(self.UPDATE_IT)
         self.gridLayout_2.addWidget(self.splitter_2, 0, 0, 1, 1)
         update.setCentralWidget(self.centralwidget)
 
@@ -221,7 +222,7 @@ class Ui_update(object):
         self.SHOW.setText(_translate("update", "SHOW"))
         self.CAPTURE.setText(_translate("update", "CAPTURE"))
         self.BACK.setText(_translate("update", "BACK"))
-        self.SUBMIT.setText(_translate("update", "SUBMIT"))
+        self.UPDATE_IT.setText(_translate("update", "UPDATE"))
 
 
 if __name__ == "__main__":

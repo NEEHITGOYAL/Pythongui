@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'delete.ui'
+# Form implementation generated from reading ui file 'add.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -10,7 +10,12 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+import sys
+import platform
+from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2.QtCore import (QCoreApplication, QPropertyAnimation, QDate, QDateTime, QMetaObject, QObject, QPoint, QRect, QSize, QTime, QUrl, Qt, QEvent)
+from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont, QFontDatabase, QIcon, QKeySequence, QLinearGradient, QPalette, QPainter, QPixmap, QRadialGradient)
+from PySide2.QtWidgets import *
 
 class Ui_DELETE_2(object):
     def setupUi(self, DELETE_2):

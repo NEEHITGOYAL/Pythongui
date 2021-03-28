@@ -81,7 +81,8 @@ background-color: rgb(229, 164, 244);</string>
            <item>
             <widget class="QLineEdit" name="inp_batend">
              <property name="styleSheet">
-              <string notr="true">color: rgb(136, 138, 133);</string>
+              <string notr="true">color: rgb(136, 138, 133);
+</string>
              </property>
              <property name="text">
               <string/>
@@ -359,7 +360,7 @@ color: rgb(238, 238, 236);</string>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="SUBMIT">
+         <widget class="QPushButton" name="UPDATE_IT">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -379,7 +380,7 @@ color: rgb(238, 238, 236);</string>
 color: rgb(238, 238, 236);</string>
           </property>
           <property name="text">
-           <string>SUBMIT</string>
+           <string>UPDATE</string>
           </property>
          </widget>
         </item>
