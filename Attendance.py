@@ -7,18 +7,20 @@ import requests
 from datetime import datetime
 import keyboard
 
-# from PIL import ImageGrab
- 
-path = 'ImagesAttendance'
+names_st = []
+path = 'Images'
 images = []
-classNames = []
-myList = os.listdir(path)
-print(myList)
-for cl in myList:
+
+lissst = os.listdir(path)
+
+
+print(lissst)
+
+for cl in lissst:
     curImg = cv2.imread(f'{path}/{cl}')
     images.append(curImg)
-    classNames.append(os.path.splitext(cl)[0])
-print(classNames)
+    names_st.append(os.path.splitext(cl)[0])
+print(names_st)
  
 def findEncodings(images):
     encodeList = []
@@ -28,34 +30,19 @@ def findEncodings(images):
         encodeList.append(encode)
     return encodeList
 
-def markAttendance2(name):
-    roll_no = "189086"
-    class_name = "First" 
+def markAttendance(name):
+    x=name.split("_")
+    roll_no = x[1]
+    class_name = x[0]
     password = "1016594680"
     url = "http://3.142.45.62/api/update/student/attend"
     record = requests.put(url, json ={'class_name':class_name, 'roll_no':roll_no, 'password':password , 'name':"xyz"})
     print(record.text)
-markAttendance2("ggugu")
-def markAttendance(name):
-    with open('Attendance.csv','r+') as f:
-        myDataList = f.readlines()
-        nameList = []
-        for line in myDataList:
-            entry = line.split(',')
-            nameList.append(entry[0])
-        if name not in nameList:
-            now = datetime.now()
-            dtString = now.strftime('%H:%M:%S')
-            f.writelines(f'\n{name},{dtString}')
+
+
  
-#### FOR CAPTURING SCREEN RATHER THAN WEBCAM
-# def captureScreen(bbox=(300,300,690+300,530+300)):
-#     capScr = np.array(ImageGrab.grab(bbox))
-#     capScr = cv2.cvtColor(capScr, cv2.COLOR_RGB2BGR)
-#     return capScr
- 
-encodeListKnown = findEncodings(images)
-print('Encoding Complete')
+knownencode = findEncodings(images)
+print('encoding done')
  
 cap = cv2.VideoCapture(0)
  
@@ -69,20 +56,20 @@ while True:
     encodesCurFrame = face_recognition.face_encodings(imgS,facesCurFrame)
  
     for encodeFace,faceLoc in zip(encodesCurFrame,facesCurFrame):
-        matches = face_recognition.compare_faces(encodeListKnown,encodeFace)
-        faceDis = face_recognition.face_distance(encodeListKnown,encodeFace)
-    #print(faceDis)
-        matchIndex = np.argmin(faceDis)
+        match = face_recognition.compare_faces(knownencode,encodeFace)
+        distfaces = face_recognition.face_distance(knownencode,encodeFace)
+    #print(distfaces)
+        matchIndex = np.argmin(distfaces)
  
-        if matches[matchIndex]:
-            name = classNames[matchIndex].upper()
+        if match[matchIndex]:
+            name = names_st[matchIndex].upper()
             print(name)
             y1,x2,y2,x1 = faceLoc
             y1, x2, y2, x1 = y1*4,x2*4,y2*4,x1*4
             cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0),2)
             cv2.rectangle(img,(x1,y2-35),(x2,y2),(255,0,0),cv2.FILLED)
             cv2.putText(img,name,(x1+6,y2-6),cv2.FONT_HERSHEY_COMPLEX,1,(0,0,0),2)
-            #markAttendance(name)
+            markAttendance(name)
  
     cv2.imshow('Webcam',img)
     cv2.waitKey(30)

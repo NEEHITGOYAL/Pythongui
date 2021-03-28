@@ -16,6 +16,13 @@ from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtCore import (QCoreApplication, QPropertyAnimation, QDate, QDateTime, QMetaObject, QObject, QPoint, QRect, QSize, QTime, QUrl, Qt, QEvent)
 from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont, QFontDatabase, QIcon, QKeySequence, QLinearGradient, QPalette, QPainter, QPixmap, QRadialGradient)
 from PySide2.QtWidgets import *
+from ui_menu import Ui_menu
+
+class menu(QMainWindow):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.ui = Ui_menu()
+        self.ui.setupUi(self)
 
 class Ui_Login(object):
     def setupUi(self, Login):
@@ -149,7 +156,8 @@ class Ui_Login(object):
 
         self.retranslateUi(Login)
         QtCore.QMetaObject.connectSlotsByName(Login)
-
+    
+    
     def retranslateUi(self, Login):
         _translate = QtCore.QCoreApplication.translate
         Login.setWindowTitle(_translate("Login", "MainWindow"))
