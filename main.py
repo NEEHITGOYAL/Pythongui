@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 import os
 import sys
+import numpy as np
+import cv2
 import platform
+
 from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtCore import (QCoreApplication, QPropertyAnimation, QDate, QDateTime, QMetaObject, QObject, QPoint, QRect, QSize, QTime, QUrl, Qt, QEvent)
-from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont, QFontDatabase, QIcon, QKeySequence, QLinearGradient, QPalette, QPainter, QPixmap, QRadialGradient)
+from PySide2.QtCore import *
+from PySide2.QtGui import *
 from PySide2.QtWidgets import *
+#temp_img = None
 #import Attendance
 ## ==> SPLASH SCREEN
 from ui_splash_screen import Ui_SplashScreen
@@ -23,19 +27,107 @@ from ui_delete import Ui_DELETE_2
 counter = 0
 
 class add(QMainWindow):
+    
     def __init__(self):
         QMainWindow.__init__(self)
         self.ui = Ui_add()
         self.ui.setupUi(self)
-        self.ui.BACK.clicked.connect(self.menu)
-    def menu(self):
+        self.timer = QtCore.QTimer()
+        # set timer timeout callback function
+        if not self.timer.isActive():
+            # create video capture
+            self.cap = cv2.VideoCapture(0)
+            # start timer
+            self.timer.start(20)
+        self.ui.SUBMIT.setEnabled(False)    
+        self.timer.timeout.connect(self.viewCam)
+        self.ui.BACK.clicked.connect(self.back2menu)
+        self.ui.CAPTURE.clicked.connect(self.capture)
+        self.ui.SHOW.clicked.connect(self.controlTimer)
+        self.ui.SUBMIT.clicked.connect(self.submit)
+        self.ui.inp_batend.textChanged.connect(self.on_text_changed)
+        self.ui.inp_batstart.textChanged.connect(self.on_text_changed)
+        self.ui.inp_class.textChanged.connect(self.on_text_changed)
+        self.ui.inp_name.textChanged.connect(self.on_text_changed)
+        self.ui.inp_rollno.textChanged.connect(self.on_text_changed)
+        # self.ui.SHOW.clicked.connect(self.viewCam)
+    def on_text_changed(self):
+        self.ui.SUBMIT.setEnabled(bool(self.ui.inp_batend.text()) and bool(self.ui.inp_batstart.text()) and bool(self.ui.inp_class.text()) and bool(self.ui.inp_name.text()) and bool(self.ui.inp_rollno.text()) and bool(cv2.imread("temporaryimage.jpeg") is not None))
+    def submit(self):
+        name = self.ui.inp_name.text()
+        classs = self.ui.inp_class.text()
+        bat_end = self.ui.inp_batend.text()
+        bat_start = self.ui.inp_batstart.text()
+        rollno = self.ui.inp_rollno.text()
+        img = cv2.imread("temporaryimage.jpeg")
+        msg = QMessageBox()
+        msg.setText("submitted Thankyou")
+        msg.exec_()
+
+        
+    def capture(self):
+        msg = QMessageBox()
+        msg.setText("Your Image Has Been Captured")
+        # read image in BGR format
+        ret, image = self.cap.read()
+        cv2.imwrite("temporaryimage.jpeg",image)
+        self.on_text_changed()
+        msg.exec_() 
+    def back2menu(self):
          #connect menu window
+        # stop timer
+        self.timer.stop()
+        # release video capture
+        self.cap.release() 
         self.main = menu()
         self.main.show()
         # CLOSE add
-        self.close()
-
-
+        self.close()   
+    # view camera
+    def viewCam(self):
+        #self.cap = cv2.VideoCapture(0)
+        # read image in BGR format
+        ret, image = self.cap.read()
+        # convert image to RGB format
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # get image infos
+        height, width, channel = image.shape
+        step = channel * width
+        # create QImage from image
+        qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
+        # show image in img_label
+        self.ui.imgLabel.setPixmap(QPixmap.fromImage(qImg))    
+            # setPixmap(QPixmap.fromImage(qImg))
+    # start/stop timer
+    def controlTimer(self):
+        # if timer is stopped
+        if not self.timer.isActive():
+            # create video capture
+            self.cap = cv2.VideoCapture(0)
+            # start timer
+            self.timer.start(20)
+        # if timer is started
+        else:
+            # stop timer
+            self.timer.stop()
+            # release video capture
+            self.cap.release()
+            image = cv2.imread("temporaryimage.jpeg")
+            if image is None:
+                msg = QMessageBox()
+                msg.setText("First capture a image")
+                msg.exec_()
+                self.ui.imgLabel.setText("PRESS SHOW TO START VIDEO")
+            else:
+                # convert image to RGB format
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                # get image infos
+                height, width, channel = image.shape
+                step = channel * width
+                # create QImage from image
+                qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
+                # show image in img_label
+                self.ui.imgLabel.setPixmap(QPixmap.fromImage(qImg))                
 
 class update(QMainWindow):
     def __init__(self):
