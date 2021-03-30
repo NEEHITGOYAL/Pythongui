@@ -36,7 +36,7 @@ def markAttendance(name):
     class_name = x[0]
     password = "1016594680"
     url = "http://3.142.45.62/api/update/student/attend"
-    record = requests.put(url, json ={'class_name':class_name, 'roll_no':roll_no, 'password':password , 'name':"xyz"})
+    record = requests.put(url, json ={'class_name':class_name, 'roll_no':roll_no, 'password':password })
     print(record.text)
 
 

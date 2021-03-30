@@ -4,7 +4,7 @@ import sys
 import numpy as np
 import cv2
 import platform
-
+import requests
 from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtCore import *
 from PySide2.QtGui import *
@@ -54,14 +54,37 @@ class add(QMainWindow):
     def on_text_changed(self):
         self.ui.SUBMIT.setEnabled(bool(self.ui.inp_batend.text()) and bool(self.ui.inp_batstart.text()) and bool(self.ui.inp_class.text()) and bool(self.ui.inp_name.text()) and bool(self.ui.inp_rollno.text()) and bool(cv2.imread("temporaryimage.jpeg") is not None))
     def submit(self):
+        
+        msg = QMessageBox()
         name = self.ui.inp_name.text()
-        classs = self.ui.inp_class.text()
+        class_name = self.ui.inp_class.text()
         bat_end = self.ui.inp_batend.text()
         bat_start = self.ui.inp_batstart.text()
-        rollno = self.ui.inp_rollno.text()
+        roll_no = self.ui.inp_rollno.text()
+        batch = bat_start +"-"+bat_end[2:]
+        password = "1016594680"
+        url = "http://3.142.45.62/api/student/custom"
+        output  = requests.post(url, json={"name":name,"roll_no":roll_no,"batch":batch,"class_name":class_name,"password":password})
+        print(output.text)
         img = cv2.imread("temporaryimage.jpeg")
-        msg = QMessageBox()
-        msg.setText("submitted Thankyou")
+        os.remove("temporaryimage.jpeg")
+        os.chdir("Images")
+        if not os.path.exists(class_name + "_" + roll_no + ".jpeg"):
+            cv2.imwrite(class_name + "_" + roll_no + ".jpeg",img)
+            msg.setText("submitted Thankyou")
+        else:
+            msg.setText("Already student exists cannot add")
+        os.chdir("..")
+        # stop timer
+        self.timer.stop()
+        # release video capture
+        self.cap.release() 
+        self.ui.imgLabel.setText("PRESS SHOW TO START VIDEO")
+        self.ui.inp_batend.clear()
+        self.ui.inp_batstart.clear()
+        self.ui.inp_name.clear()
+        self.ui.inp_rollno.clear()
+        self.ui.inp_class.clear()
         msg.exec_()
 
         
@@ -74,7 +97,9 @@ class add(QMainWindow):
         self.on_text_changed()
         msg.exec_() 
     def back2menu(self):
-         #connect menu window
+        #delete temporaryimage if there
+        if os.path.exists("temporaryimage.jpeg"):
+            os.remove("temporaryimage.jpeg")
         # stop timer
         self.timer.stop()
         # release video capture
@@ -148,12 +173,35 @@ class DELETE_2(QMainWindow):
         self.ui = Ui_DELETE_2()
         self.ui.setupUi(self)
         self.ui.BACK.clicked.connect(self.menu)
+        self.ui.DELETE.clicked.connect(self.delete)
+        self.ui.inp_class.textChanged.connect(self.on_text_changed)
+        self.ui.inp_name.textChanged.connect(self.on_text_changed)
+        self.ui.inp_rollno.textChanged.connect(self.on_text_changed)
+    def on_text_changed(self):
+        self.ui.DELETE.setEnabled(bool(self.ui.inp_name.text()) and bool(self.ui.inp_class.text()) and bool(self.ui.inp_rollno.text()))
     def menu(self):
          #connect menu window
         self.main = menu()
         self.main.show()
         # CLOSE delete
         self.close()   
+    def delete(self):
+        msg = QMessageBox()
+        name = self.ui.inp_name.text()
+        classs = self.ui.inp_class.text()
+        roll_no = self.ui.inp_rollno.text()
+        os.chdir("Images")
+        url = "http://3.142.45.62/api/student/delete"
+        output  = requests.put(url, json={"roll_no":roll_no , "password":"1016594680"})
+        print(output.text)
+        if os.path.exists(classs + "_" + roll_no + ".jpeg"):
+            msg.setText("Deleted Successfully")
+            os.remove(classs + "_" + roll_no + ".jpeg")
+            os.chdir("..")
+        else:
+            msg.setText("There is no student with these credential please Recheck")
+        msg.exec_()    
+
 
 class menu(QMainWindow):
     def __init__(self):
