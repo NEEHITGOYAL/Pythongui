@@ -159,13 +159,122 @@ class update(QMainWindow):
         QMainWindow.__init__(self)
         self.ui = Ui_update()
         self.ui.setupUi(self)
-        self.ui.BACK.clicked.connect(self.menu)
-    def menu(self):
-         #connect menu window
+        self.timer = QtCore.QTimer()
+        # set timer timeout callback function
+        if not self.timer.isActive():
+            # create video capture
+            self.cap = cv2.VideoCapture(0)
+            # start timer
+            self.timer.start(20)
+        self.ui.UPDATE_IT.setEnabled(False)    
+        self.timer.timeout.connect(self.viewCam)
+        self.ui.BACK.clicked.connect(self.back2menu)
+        self.ui.CAPTURE.clicked.connect(self.capture)
+        self.ui.SHOW.clicked.connect(self.controlTimer)
+        self.ui.UPDATE_IT.clicked.connect(self.updateit)
+        self.ui.inp_batend.textChanged.connect(self.on_text_changed)
+        self.ui.inp_batstart.textChanged.connect(self.on_text_changed)
+        self.ui.inp_class.textChanged.connect(self.on_text_changed)
+        self.ui.inp_name.textChanged.connect(self.on_text_changed)
+        self.ui.inp_rollno.textChanged.connect(self.on_text_changed)
+        # self.ui.SHOW.clicked.connect(self.viewCam)
+    def on_text_changed(self):
+        self.ui.SUBMIT.setEnabled(bool(self.ui.inp_batend.text()) and bool(self.ui.inp_batstart.text()) and bool(self.ui.inp_class.text()) and bool(self.ui.inp_name.text()) and bool(self.ui.inp_rollno.text()) and bool(cv2.imread("temporaryimage.jpeg") is not None))
+    def updateit(self):
+        
+        msg = QMessageBox()
+        name = self.ui.inp_name.text()
+        class_name = self.ui.inp_class.text()
+        bat_end = self.ui.inp_batend.text()
+        bat_start = self.ui.inp_batstart.text()
+        roll_no = self.ui.inp_rollno.text()
+        img = cv2.imread("temporaryimage.jpeg")
+        os.remove("temporaryimage.jpeg")
+        os.chdir("Images")
+        if os.path.exists(class_name + "_" + roll_no + ".jpeg"):
+            cv2.imwrite(class_name + "_" + roll_no + ".jpeg",img)
+            msg.setText("UPDATED SUCCESSFULLY")
+        else:
+            msg.setText("there is no student with this name")
+        os.chdir("..")
+        # stop timer
+        self.timer.stop()
+        # release video capture
+        self.cap.release() 
+        self.ui.imgLabel.setText("PRESS SHOW TO START VIDEO")
+        self.ui.inp_batend.clear()
+        self.ui.inp_batstart.clear()
+        self.ui.inp_name.clear()
+        self.ui.inp_rollno.clear()
+        self.ui.inp_class.clear()
+        msg.exec_()
+
+        
+    def capture(self):
+        msg = QMessageBox()
+        msg.setText("Your Image Has Been Captured")
+        # read image in BGR format
+        ret, image = self.cap.read()
+        cv2.imwrite("temporaryimage.jpeg",image)
+        self.on_text_changed()
+        msg.exec_() 
+    def back2menu(self):
+        #delete temporaryimage if there
+        if os.path.exists("temporaryimage.jpeg"):
+            os.remove("temporaryimage.jpeg")
+        # stop timer
+        self.timer.stop()
+        # release video capture
+        self.cap.release() 
         self.main = menu()
         self.main.show()
-        # CLOSE update
-        self.close()    
+        # CLOSE add
+        self.close()   
+    # view camera
+    def viewCam(self):
+        #self.cap = cv2.VideoCapture(0)
+        # read image in BGR format
+        ret, image = self.cap.read()
+        # convert image to RGB format
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # get image infos
+        height, width, channel = image.shape
+        step = channel * width
+        # create QImage from image
+        qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
+        # show image in img_label
+        self.ui.imgLabel.setPixmap(QPixmap.fromImage(qImg))    
+            # setPixmap(QPixmap.fromImage(qImg))
+    # start/stop timer
+    def controlTimer(self):
+        # if timer is stopped
+        if not self.timer.isActive():
+            # create video capture
+            self.cap = cv2.VideoCapture(0)
+            # start timer
+            self.timer.start(20)
+        # if timer is started
+        else:
+            # stop timer
+            self.timer.stop()
+            # release video capture
+            self.cap.release()
+            image = cv2.imread("temporaryimage.jpeg")
+            if image is None:
+                msg = QMessageBox()
+                msg.setText("First capture a image")
+                msg.exec_()
+                self.ui.imgLabel.setText("PRESS SHOW TO START VIDEO")
+            else:
+                # convert image to RGB format
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                # get image infos
+                height, width, channel = image.shape
+                step = channel * width
+                # create QImage from image
+                qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
+                # show image in img_label
+                self.ui.imgLabel.setPixmap(QPixmap.fromImage(qImg))  
         
 class DELETE_2(QMainWindow):
     def __init__(self):
@@ -195,6 +304,9 @@ class DELETE_2(QMainWindow):
         output  = requests.put(url, json={"roll_no":roll_no , "password":"1016594680"})
         print(output.text)
         if os.path.exists(classs + "_" + roll_no + ".jpeg"):
+            self.ui.inp_name.clear()
+            self.ui.inp_rollno.clear()
+            self.ui.inp_class.clear()
             msg.setText("Deleted Successfully")
             os.remove(classs + "_" + roll_no + ".jpeg")
             os.chdir("..")
